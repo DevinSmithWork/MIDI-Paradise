@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <title>MIDI Paradise</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Meta tags -->
+    <meta name="description" content="Sit back. Relax. Hit Play... It's MIDI Paradise.">
+    <meta name="keywords" content="MIDI,Music,90s,pop">
+    <meta name="author" content="Devin Smith">
+
+    <meta property="og:title" content="MIDI Paradise">
+    <meta property="og:description" content="Sit back. Relax. Hit Play. Welcome... to MIDI Paradise.">
+    <meta property="og:image" content="http://www.devinsmith.work/midiparadise/tcard-large.jpg">
+    <meta property="og:url" content="http://www.devinsmith.work/midiparadise">
+
+
+    <!-- Song data JSON -->
+    <script src="songData.js"></script>
+
+    <!--Twitter card-->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="devinsmith.work/midiparadise">
+    <meta name="twitter:creator" content="@devinsmithwork">
+    <meta name="twitter:title" content="MIDI Paradise">
+    <meta name="twitter:description" content="Welcome to... MIDI Paradise.">
+    <meta name="twitter:image" content="http://www.devinsmith.work/midiparadise/tcard-large.jpg">
+
+    <style>
+
+    body {
+    	font-family:monospace;
+    	font-size:large;
+        background:black;
+
+    	background-image: url("wallpaper/0.png");
+    	background-size:auto 100vh;
+    	background-attachment:fixed;
+
+        image-rendering: optimizeSpeed;
+        image-rendering: -moz-crisp-edges; 
+        image-rendering: -o-crisp-edges; 
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: pixelated;
+        image-rendering: optimize-contrast;
+        -ms-interpolation-mode: nearest-neighbor;
+    }
+
+    #bgLazyLoad {
+    	display:none;
+    	padding:0em;
+    	margin:0em;
+    	size:100vw, 100vh;
+    	background-size:auto 100vh;
+    	background-attachment:fixed;
+    }
+
+    #main {
+        display:flex;
+        flex-direction: column;
+    	max-width: 400px;
+    	margin:0px auto;
+        height:95vh;
+    }
+
+    h1 {
+		text-align:center;
+		color:yellow;
+		text-shadow:2px 2px magenta;
+    }
+
+    h2 {
+    	text-align: center;
+    	padding:0.1em;
+    	margin:0.2em;
+
+        background:black;
+        border:0.1em inset #666;
+        color:yellow;
+    }
+
+    .marqueePaddingFix {
+
+    }
+
+    marquee {
+        padding:0;
+        margin:0;
+    }
+
+    #logoDiv {
+        text-align: center;
+        padding:0.5em 0em;
+    }
+
+    .logo {
+        max-width:287px;
+        height:auto;
+    }
+
+    #playerDiv {
+    	background:lightgrey;
+    	border:0.2em outset lightgrey;
+    	padding:0.2em;
+    }
+
+    #playerControls {
+    	text-align: center;
+    	display:flex;
+    }
+
+    #playerControls button {
+        font-family: monospace;
+        font-weight:bold;
+        color: rgb(67,91,108);
+        text-shadow: 1px 1px white;
+        font-size:1em;
+        height:2.5em;
+    	width:100%;
+    	margin:0.2em;
+        background: #eee;
+        border:.2em outset #eee;
+    }
+
+    #playerControls button:active {
+        background: #ccc;
+        border:.2em inset #eee;
+    }
+
+    #playlist {
+    	margin-top:1em;
+    	overflow-y: scroll;
+    	background:rgba(0,0,0,0.6);
+        border:0.2em outset lightgrey;
+        height:100%;
+    }
+
+    #playlist button {
+    	font-family: monospace;
+    	font-size:1em;
+    	text-align: left;
+    	display:block;
+    	margin-top:0.2em;
+    	padding:0.2em;
+    	width:100%;
+        background:transparent;
+        border:none;
+        border-bottom:1px dotted yellow;
+    	color:yellow;
+    }
+
+    #playlist button:hover {
+        color:orange;
+    }
+
+    #about {
+        display:none;
+        margin-top:1em;
+        overflow-y: scroll;
+        background:rgba(0,0,0,0.6);
+        border:0.2em outset lightgrey;
+        color:yellow;
+        padding:.2em;
+    }
+
+    #about h2 {
+        background:transparent;
+        border:none;
+    }
+
+    #about h3 {
+        padding-top:1em;
+        margin-top:0em;
+        text-align: center;
+    }
+
+    #about a {color:yellow;}
+    #about a:hover {color:orange;}
+
+    .pcb {
+        height:20px;
+        width:auto;
+        vertical-align: -5px;
+    }
+
+    .playing {
+        color:aqua;
+    }
+
+    #bottom {
+        margin-top:1em;
+        background:lightgrey;
+        border:0.2em outset lightgrey;
+        padding:0.2em;
+    }
+
+    #bottomButtons {
+        text-align: center;
+        display:flex;
+    }
+
+    #bottom button {
+        font-family: monospace;
+        font-weight:bold;
+        color: rgb(67,91,108);
+        text-shadow: 1px 1px white;
+
+        font-size:1em;
+        height:2em;
+        width:100%;
+        margin:0.2em;
+        background: #eee;
+        border:.2em outset #eee;
+    }
+
+    #bottom button:active {
+        background: #ccc;
+        border:.2em inset #eee;
+    }
+
+    #playlistLoading {
+    	padding-top:2em;
+    	color:yellow;
+    	text-align: center;
+    }
+
+
+	</style>
+
+</head>
+
+<body onload="buildPlaylist()">
+	<div id="main">
+    <div id="logoDiv" width=195 height=80>
+        <img class="logo" src="MIDI-Paradise-small.png">
+    </div>
+
+	<div id="playerDiv">
+		<h2 id="playerTitle">Loading...</h2>
+	    <audio id="player" src="128-MP3/All Night Long.mp3" oncanplay="canplayTriggered()" onended="autoplayNext()"></audio>
+		<div id="playerControls">
+            <button id="shuffle" onclick="toggleShuffle()">SHUF</button>
+            <button id="playbtn" onclick="togglePlay()"><img class="pcb" src="play.png"></button>
+            <button onclick="document.getElementById('player').pause();autoplayNext();"><img class="pcb" src="next.png"></button> 
+<!-- 		  <button onclick="document.getElementById('player').volume += 0.1">VOL+</button> 
+		  <button onclick="document.getElementById('player').volume -= 0.1">VOL-</button>  -->
+		</div>
+	</div>
+
+	<div id="playlist">
+		<div id="playlistLoading">
+			Playlist Loading...
+		</div>
+	</div>
+
+    <div id="about">
+        <h2>About</h2>
+       <p>
+       	MIDI Paradise was put together by <a href="http://devinsmith.work">Devin Smith</a> in March of 2020.
+		</p>
+		<p>
+			The MIDIs came from a ridiculous set of <a href="https://mega.nz/#%21Elg1TA7T%21MXEZPzq9s9YObiUcMCoNQJmCbawZqzAkHzY4Ym6Gs_Q">130,000 files</a> scraped &amp; collated by the aptly-named <a href="https://www.reddit.com/r/WeAreTheMusicMakers/comments/3ajwe4/the_largest_midi_collection_on_the_internet/">Reddit user MidiMan</a> in 2016. The backgrounds were ripped from Sega Genesis ROMs by the <a href="https://www.spriters-resource.com">Spriters' Resource</a> users <a href="https://www.spriters-resource.com/submitter/silversea/">Silversea</a>, <a href="https://www.spriters-resource.com/submitter/shadowbot/">Shadowbot</a>, and <a href="https://www.spriters-resource.com/submitter/rabidrodent/">Rabidrodent</a>.
+		</p>
+		<h3>
+			Audio Process
+		</h3>
+		<p>
+			Mea Culpa: You're not actually listening to MIDI files. These are recordings of MIDI files played back on my Roland SC-155, mastered with T-Rax 3CS, and exported to MP3s.
+		</p>
+		<p>
+			There's good reason to do it this way! For one, the quality of the SC-series instruments is fantastic, extremely 90s-sounding, and generally better than most modern OS's GM sets (which often seem to be included only as an afterthought, for legacy support). And secondly, the SC-155 also employs Roland's proprietary <a href="https://en.wikipedia.org/wiki/Roland_GS">GS extension</a> of the General MIDI spec.</p>
+		<p>
+			GS includes useful extras like configurable reverb and chorus, and instrument-level settings for filters, envelope shaping, and vibrato controls. Many of the MIDI files selected here make creative use of these features: For example, check out the wah guitar in <i>Waterfalls</i>, achieved via automating the GS filter settings. Which brings me to my next point...
+		</p>
+		<h3>
+			What Makes a "Good" MIDI?
+		</h3>
+		<p>
+			A set of 60 songs from 130,000 is an awfully deep cut! For this round, I elected to forgo Jazz, Classical, etc, and focused only on pop songs. A few things became apparent here.
+		</p>
+		<p>
+			The pop material generally ends in the mid-2000s, around the time MP3s superseded MIDIs online. There's a recency bias towards 90s pop, and a large portion of the songs come from the omnipresent chart-toppers you might expect (Beatles, Madonna, etc).
+		</p>
+		<p>
+			Multiple arrangements for a single song is more the rule than the exception, and it quickly becomes apparent which arrangers are just slapping notes on the page, and which are really <i>Going For It</i>.
+		</p>
+		<p>
+			Musically, judging a non-MIDI arrangement revolves around how an arranger employs the ensemble's particular instrumentation and techniques in service to a song. With MIDI, you have access to a full orchestra, slammin' 808s, a jazz combo, death metal guitars, futuristic synths -- the whole gamut! Coupled with all the expressiveness of MIDI CCs, you've got a wide palette here.
+		</p>
+		<p>
+			One hallmark of a good MIDI is an attentiveness to this plethora of options: Like including juicy pitch bends and vibrato to guitar leads (<i>Right Down The Line</i>), using instrumentation to mimic iconic production details (<i>Escapade</i>, <i>Diamonds And Pearls</i>), or tackling absurdly ambitious material (<i>Roundabout</i>). A killer MIDI is truly a labor of love.
+		</p>
+		<p>
+			Sometimes, a MIDI arrangement gets better as it tilts slightly toward the absurd. Sure, you could use a flute, but the shakuhachi has that certain special <i>something</i> -- a good MIDI knows that it's a MIDI.
+		</p>
+		<p>
+			Lastly, this collection is a bit heavy on Smooth R&amp;B, Adult Contemporary, and Yacht Rock. This isn't just personal taste -- though, obviously, that's a factor -- but that the arrangers who gravitated to this material clearly knew their stuff. Considering the laborious and confounding state of music software in the 80s &amp; 90s, it seems likely that many were professionals. The The Steely Dan tunes in particular show a dedication not only in transcribing these rather obtuse charts, but going the extra mile to really make the MIDIs <i>slap</i>.
+		</p>
+		<p>
+			Maybe, in the end, that old canard about pornography may best describe a "Good" MIDI: you know it when you hear it.
+		</p>
+		<p>&nbsp;&nbsp;&nbsp;- Devin
+		</p>
+
+    </div>
+
+
+
+    <div id="bottom">
+        <div id="bottomButtons">
+        <button id="aboutButton" onclick="toggleAbout()">ABOUT</button>
+        <button onclick="cycleWallpaper()">WALLPAPER</button>
+        </div>
+    </div>
+
+	</div>
+
+	<div id="bgLazyLoad">
+        <img src="wallpaper/1.png">
+        <img src="pause.png">
+    </div>
+
+	<script>
+
+        var shuffle = true;
+        var playing = false;
+        var firstPlay = true;
+        var aboutShown = false;
+
+        var availableSongs = [];
+		var currentSongID = -1;
+        var songText = "Lionel Richie - All Night Long";
+
+		var wallpapers = ["","","gif","","","","","","","",];
+
+
+        function canplayTriggered() {
+            document.getElementById('playerTitle').innerHTML = "<marquee>" + songText + "</marquee>";
+            if (playing) document.getElementById('player').play();
+        }
+
+		function chSong(x) {
+			if (x.id != currentSongID) {
+                if (firstPlay) {
+                    firstPlay = false;
+                    playing = true;
+                    document.getElementById("playbtn").innerHTML = '<img class="pcb" src="pause.png">';
+                }
+                currentSongID = x.id;
+                var newSong = songData[x.id];
+                removeAvailable(x.id);
+
+                songText = newSong.Artist + " - " + newSong.Title;
+                if (newSong.Credit != undefined) {
+                    songText += " - " + newSong.Credit;
+                }
+
+                var songFile;
+                if (newSong.Filename != undefined) {
+					songFile = "128-MP3/" + newSong.Filename + ".mp3";
+                } else {
+                	songFile = "128-MP3/" + newSong.Title + ".mp3";
+                }
+
+                document.getElementById("playerTitle").innerHTML = "<marquee>Loading...</marquee>";
+                swapSong(songFile);
+			}
+		}
+
+
+		/*================================*/
+		// Song swap callbacks for safety.
+        function swapSong(SF) {
+            pauseP(function() {
+                loadP(SF);
+            });
+        }
+
+		function pauseP(callback) {
+			document.getElementById('player').pause();
+			callback();
+		}
+
+		function loadP (SF, callback) {
+			document.getElementById('player').setAttribute('src', SF);
+		}
+		/*================================*/
+
+
+        function toggleShuffle() {
+            shuffle = !(shuffle);
+            if (shuffle) {
+                document.getElementById("shuffle").innerHTML = "SHUF";
+            } else {
+                document.getElementById("shuffle").innerHTML = "A-Z";
+            }
+
+        }
+
+
+        function togglePlay() {
+            if (firstPlay) firstPlay = false;
+            playing = !(playing);
+            if (playing) {
+                document.getElementById('player').play();
+                document.getElementById("playbtn").innerHTML = '<img class="pcb" src="pause.png">';
+            } else {
+                document.getElementById('player').pause();
+                document.getElementById("playbtn").innerHTML = '<img class="pcb" src="play.png">';
+            }
+        }
+
+
+        function toggleAbout() {
+            if (aboutShown) {
+                document.getElementById("playlist").style.display = "block";
+                document.getElementById("about").style.display = "none";
+                document.getElementById("aboutButton").innerHTML = "ABOUT";
+            } else {
+                document.getElementById("playlist").style.display = "none";
+                document.getElementById("about").style.display = "block";
+                document.getElementById("aboutButton").innerHTML = "PLAYLIST";
+            }
+            aboutShown = !(aboutShown);
+        }
+
+
+        function autoplayNext() {
+            if (shuffle) {
+                var r = Math.floor(Math.random() * availableSongs.length);
+                chSong(document.getElementById(availableSongs[r]));
+            } else {
+                var nSongID = currentSongID;
+
+                while (availableSongs.indexOf(nSongID) == -1) {
+                    nSongID++;
+                    if (nSongID > 61) nSongID=0;
+                }
+
+                chSong(document.getElementById(nSongID));
+            }
+        }
+
+
+		function buildPlaylist() {
+			var playlist = document.getElementById("playlist");
+			for (var i=0;i<songData.length;i++) {
+				var song = songData[i];
+				var btn = document.createElement("button");
+                btn.id = i;
+				btn.className += "sg";
+				btn.setAttribute( "onclick", "chSong(this)" )
+				btn.innerHTML = song.Artist + " - " + song.Title;
+				playlist.appendChild(btn);
+			}
+			var loadingDiv = document.getElementById("playlistLoading");
+			playlist.removeChild(loadingDiv);
+
+            resetAvailable();
+            document.getElementById("playerTitle").innerHTML = "<marquee>Lionel Richie - All Night Long</marquee>";
+		}
+		
+
+        function removeAvailable(n) {
+            // n is passed a String, convert to int
+            n = parseInt(n,10);
+
+            if (availableSongs.indexOf(n) != -1) {
+                availableSongs.splice(availableSongs.indexOf(n), 1);
+            }
+
+            if (availableSongs.length == 0) {
+                resetAvailable();
+            }
+        }
+
+        function resetAvailable() {
+            for (var i=0;i<songData.length;i++) {
+                availableSongs.push(i);
+            }
+        }
+
+        var cWall =0;
+        var nWall =1;
+        var allWallsLoaded = false;
+
+        function cycleWallpaper() {
+            if (allWallsLoaded==false) cycleNextWallpaper();
+
+            cWall++;
+            if (cWall == wallpapers.length-1) cWall = 0;
+
+            var bgURL = "wallpaper/" + cWall + ".";
+            if (wallpapers[cWall] != "") {
+				bgURL += wallpapers[cWall];
+            } else {
+            	bgURL += "png";
+            }
+
+            document.body.style.background = "url('" + bgURL+ "')";
+            document.body.style.backgroundSize = "auto 100vh"
+            document.body.style.backgroundAttachment = "fixed;"
+        }
+
+        function cycleNextWallpaper() {
+        	nWall++;
+        	if (nWall == wallpapers.length-1) {
+        		allWallsLoaded = true;
+        	} else {
+        		var nextURL = "wallpaper/" + nWall + ".";
+
+		        if (wallpapers[nWall] != "") {
+					nextURL += wallpapers[nWall];
+		        } else {
+		        	nextURL += "png";
+		        }
+
+		        document.getElementById("bgLazyLoad").innerHTML="<img src='" + nextURL + "'>";
+        	}
+        }
+
+	</script>
+
+</body>
+</html>
