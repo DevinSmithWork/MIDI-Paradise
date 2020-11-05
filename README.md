@@ -7,6 +7,8 @@ MIDI Paradise was put together by Devin Smith in March of 2020.
 
 The MIDIs came from a ridiculous set of 130,000 files scraped & collated by the aptly-named Reddit user MidiMan in 2016. The backgrounds were ripped from Sega Genesis ROMs by the Spriters' Resource users Silversea, Shadowbot, and Rabidrodent.
 
+https://www.reddit.com/r/WeAreTheMusicMakers/comments/3ajwe4/the_largest_midi_collection_on_the_internet/
+
 ## Audio Process
 Mea Culpa: You're not actually listening to MIDI files. These are recordings of MIDI files played back on my Roland SC-155, mastered with T-Rax 3CS, and exported to MP3s.
 
